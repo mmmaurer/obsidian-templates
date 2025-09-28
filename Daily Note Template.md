@@ -4,15 +4,41 @@ tags:
 ---
 <%*
 /* ====== CONFIG ====== */
-const DAILY_FOLDER = "Daily Notes/2025/";     // trailing slash ok
-const FILENAME_FORMAT = "YYYY-MM-DD";         // your daily note filename format
+// path to daily notes folder, relative to vault root, with trailing slash
+// Assumes a year-based subfolder structure, e.g. "Daily Notes/2025/"
+const DAILY_FOLDER = "Daily Notes/" + tp.date.now("YYYY") + "/"; 
+const FILENAME_FORMAT = "YYYY-MM-DD";         // your daily note filename format. I use ISO (2024-06-15.md) to keep files in order
+// Headings of sections to carry over from yesterday's note
 const HEADINGS = ["TODOs", "Keep in mind", "Braindump"]; // sections to carry over
 /* ===================== */
 
-// Resolve yesterday's file
-const yName = tp.date.yesterday(FILENAME_FORMAT) + ".md";
-const yPath = DAILY_FOLDER.endsWith("/") ? DAILY_FOLDER + yName : DAILY_FOLDER + "/" + yName;
-const yTFile = tp.file.find_tfile(yPath);
+// Resolve last daily note
+const folderWithSlash = DAILY_FOLDER.endsWith("/") ? DAILY_FOLDER : DAILY_FOLDER + "/";
+const momentLib =
+  (typeof app !== "undefined" && app.moment) ||
+  (typeof window !== "undefined" && window.moment) ||
+  null;
+let yName = "";
+let yPath = "";
+let yTFile = null;
+
+if (momentLib) {
+  const MAX_LOOKBACK_DAYS = 14;
+  let cursor = momentLib().subtract(1, "day");
+  for (let i = 0; i < MAX_LOOKBACK_DAYS; i++) {
+    yName = cursor.format(FILENAME_FORMAT) + ".md";
+    yPath = folderWithSlash + yName;
+    yTFile = tp.file.find_tfile(yPath);
+    if (yTFile) break;
+    cursor = cursor.subtract(1, "day");
+  }
+}
+
+if (!yTFile) {
+  yName = tp.date.yesterday(FILENAME_FORMAT) + ".md";
+  yPath = folderWithSlash + yName;
+  yTFile = tp.file.find_tfile(yPath);
+}
 
 let yContent = "";
 if (yTFile) {

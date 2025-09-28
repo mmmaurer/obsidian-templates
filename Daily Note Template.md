@@ -60,14 +60,59 @@ function extractFirstSection(md, heading) {
   return m ? (m[1] || "").trim() : "";
 }
 
+function filterIncompleteTasks(sectionText) {
+  if (!sectionText) return "";
+
+  const lines = sectionText.split("\n");
+  const result = [];
+  let pending = [];
+  const doneStatuses = new Set(["x", "done", "complete", "completed", "checked"]);
+  const cancelledStatuses = new Set(["-", "cancelled", "canceled", "cancel", "c"]);
+
+  function flushPending() {
+    if (!pending.length) return;
+    if (!result.length) {
+      while (pending.length && pending[0].trim() === "") pending.shift();
+    }
+    if (result.length && result[result.length - 1].trim() === "") {
+      while (pending.length && pending[0].trim() === "") pending.shift();
+    }
+    if (pending.length) result.push(...pending);
+    pending = [];
+  }
+
+  for (const line of lines) {
+    const match = line.match(/^\s*[-*]\s+\[([^\]]*)\]/);
+    if (!match) {
+      pending.push(line);
+      continue;
+    }
+
+    const status = match[1].trim().toLowerCase();
+    if (doneStatuses.has(status) || cancelledStatuses.has(status)) {
+      continue;
+    }
+
+    flushPending();
+    result.push(line);
+  }
+
+  while (result.length && result[result.length - 1].trim() === "") {
+    result.pop();
+  }
+
+  return result.join("\n");
+}
+
 // Build today's note
 let out = "";
 // Always start a fresh Log (not carried over)
 out += "# Log\n- \n";
 for (const h of HEADINGS) {
   const text = extractFirstSection(yContent, h);
+  const sectionText = h === "TODOs" ? filterIncompleteTasks(text) : text;
   out += `# ${h}\n`;
-  if (text) out += text + "\n";
+  if (sectionText) out += sectionText + "\n";
   else out += "\n";
 }
 

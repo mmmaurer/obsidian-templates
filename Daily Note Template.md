@@ -65,35 +65,20 @@ function filterIncompleteTasks(sectionText) {
 
   const lines = sectionText.split("\n");
   const result = [];
-  let pending = [];
   const doneStatuses = new Set(["x", "done", "complete", "completed", "checked"]);
   const cancelledStatuses = new Set(["-", "cancelled", "canceled", "cancel", "c"]);
-
-  function flushPending() {
-    if (!pending.length) return;
-    if (!result.length) {
-      while (pending.length && pending[0].trim() === "") pending.shift();
-    }
-    if (result.length && result[result.length - 1].trim() === "") {
-      while (pending.length && pending[0].trim() === "") pending.shift();
-    }
-    if (pending.length) result.push(...pending);
-    pending = [];
-  }
 
   for (const line of lines) {
     const match = line.match(/^\s*[-*]\s+\[([^\]]*)\]/);
     if (!match) {
-      pending.push(line);
       continue;
     }
 
-    const status = match[1].trim().toLowerCase();
+    const status = match[1];
     if (doneStatuses.has(status) || cancelledStatuses.has(status)) {
       continue;
     }
 
-    flushPending();
     result.push(line);
   }
 

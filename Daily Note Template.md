@@ -5,9 +5,9 @@ tags:
 <%*
 /* ====== CONFIG ====== */
 // path to daily notes folder, relative to vault root, with trailing slash
-// Assumes a year-based subfolder structure, e.g. "Daily Notes/2025/"
-const DAILY_FOLDER = "Daily Notes/" + tp.date.now("YYYY") + "/"; 
-const FILENAME_FORMAT = "YYYY-MM-DD";         // your daily note filename format. I use ISO (2024-06-15.md) to keep files in order
+// Assumes a year-based subfolder structure, e.g. "Daily Notes/"
+const DAILY_FOLDER = "Daily Notes/"; 
+const FILENAME_FORMAT = "YYYY-MM-DD"; // your daily note filename format. I use ISO (2024-06-15.md) to keep files in order
 // Headings of sections to carry over from yesterday's note
 const HEADINGS = ["TODOs", "Keep in mind", "Braindump"]; // sections to carry over
 /* ===================== */

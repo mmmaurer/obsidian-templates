@@ -3,7 +3,6 @@ tags:
   - meeting-note
   - phd
 date:
-
 ---
 <%*
 const folder = "Meeting Notes/PhD Meetings/";
@@ -58,3 +57,7 @@ if (!latestFile) {
 - 
 # Keep in Mind
 - 
+<%
+// Rename the file to include a timestamp to ensure uniqueness
+await tp.file.rename(tp.date.now("YYYY-MM-DD" + ", PhD Meeting"));
+%>

@@ -1,11 +1,12 @@
 ---
 tags:
   - reading-note
-authors: 
-read: 
-language: 
+authors:
+read:
+language:
 topics:
 creation date: <% tp.file.creation_date() %>
+aliases:
 ---
 # Synopsis
 
